@@ -31,19 +31,6 @@ def main():
     else:
         audios = [str(input_path)]
 
-    """# Transcribe
-    transcriptions = asr_model.transcribe(audios, batch_size=1)[0]
-
-    for audio_path_str, transcription in zip(audios, transcriptions):
-        current_audio_path = Path(audio_path_str)
-
-        # Extract text out of Hypothesis object if needed
-        text = transcription.text if hasattr(transcription, "text") else str(transcription)
-
-        output_file = output_path / (current_audio_path.stem + ".txt") if input_path.is_dir() else output_path
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(text)"""
-
     for audio in audios:
         # Transcribe 
         # get hypothesis object from NeMo parakeet

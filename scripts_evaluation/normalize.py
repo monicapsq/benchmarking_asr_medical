@@ -28,28 +28,18 @@ def main():
     #         new_txt = unidecode(txt, "utf-8")
     #         return new_txt
 
-    class TransformText2Num(jiwer.transforms.AbstractTransform): # From Stéphanie's normalization script
+    class TransformText2Num(jiwer.transforms.AbstractTransform):
         def process_string(self, txt: str):
-            new_txt = txt
-            splitted_txt = txt.split()
-            for i, t in enumerate(splitted_txt):
-                if i+1 < len(splitted_txt):
-                    if splitted_txt[i+1] in ["mois", "jours", "an", "ans"]:
-                        try:
-                            textual_nb = str(text2num(t, "fr"))
-                            new_txt = new_txt.replace(t, textual_nb)
-                        except ValueError:
-                            pass
-                if i+2 < len(splitted_txt):
-                    if splitted_txt[i+2] in ["mois", "jours", "an", "ans", "heures"]:
-                        try:
-                            textual_nb = str(text2num(t, "fr"))
-                            new_txt = new_txt.replace(t, textual_nb)
-                        except ValueError:
-                            pass
-            return new_txt
+            def convert_token(token: str) -> str:
+                try:
+                    return str(text2num(token, "fr"))
+                except ValueError:
+                    return token 
+                
+            tokens = txt.split()
+            return " ".join(convert_token(token) for token in tokens)
         
-    class TransformNum2Text(jiwer.transforms.AbstractTransform): # From Stéphanie's normalization script
+    class TransformNum2Text(jiwer.transforms.AbstractTransform):
         def process_string(self, txt: str):
             converter = NumberToText(language="fr")
 
@@ -71,11 +61,11 @@ def main():
         jiwer.ToLowerCase(), # pas de majuscule 
         # jiwer.RemoveMultipleSpaces(),
         jiwer.Strip(), # Removes leading and trailing spaces
-        jiwer.RemovePunctuation(), # pas de ponctuation
         jiwer.SubstituteRegexes({r"oe": r"œ"}), # Aligning to Stéphanie's
         TransformHours(), 
         TransformText2Num(), # Chriffres en chiffres
         TransformNum2Text(),
+        jiwer.RemovePunctuation(), # pas de ponctuation after transforming text to digits
     ])
 
     # Wrapper to normalize

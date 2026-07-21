@@ -1,6 +1,7 @@
 import jiwer
 import argparse
 from pathlib import Path
+from statistics import mean, median, stdev
 
 def main():
     parser = argparse.ArgumentParser()
@@ -30,32 +31,41 @@ def main():
 
         return None
 
-    def compute_wer() -> float:
-        hypothesis_texts: list[str] = [] # hypotesis txts
-        ground_truth_texts: list[str] = [] # matching ground truth txts
+    def compute_wer() -> list[tuple[Path, Path, float]]:
+        per_file_wers: list[tuple[Path, Path, float]] = []
 
         for hypothesis_path in sorted(hypothesis.rglob("*.txt")):
-            ground_truth_path = resolve_ground_truth_path(hypothesis_path) # Find the corresponding ground truth file for the hypothesis file
+            ground_truth_path = resolve_ground_truth_path(hypothesis_path)
             if ground_truth_path is None:
-                print(f"Ground truth file not found for {hypothesis_path}. Skipping.") # Warning if no match is found
+                print(f"Ground truth file not found for {hypothesis_path}. Skipping.")
                 continue
 
-            # Read the hypothesis and ground truth texts
             with hypothesis_path.open("r", encoding="utf-8") as hyp_file:
-                hypothesis_texts.append(hyp_file.read().strip())
+                hypothesis_text = hyp_file.read().strip()
 
             with ground_truth_path.open("r", encoding="utf-8") as gt_file:
-                ground_truth_texts.append(gt_file.read().strip())
+                ground_truth_text = gt_file.read().strip()
 
-        # Warning if no hypothesis files were found
-        if not hypothesis_texts:
+            wer_value = jiwer.wer(ground_truth_text, hypothesis_text)
+            per_file_wers.append((hypothesis_path, ground_truth_path, wer_value))
+
+        if not per_file_wers:
             raise FileNotFoundError(f"No matching .txt files found in {hypothesis}")
 
-        return jiwer.wer(ground_truth_texts, hypothesis_texts) # Compute WER
+        return per_file_wers
+        
     
     print(f"Computing WER for hypothesis: {hypothesis} and ground truth: {ground_truth}")
-    wer_value = compute_wer()
-    print(f"WER: {wer_value:.4f}")
+    per_file_wers = compute_wer()
+
+    print("Per-file WERs:")
+    for hypothesis_path, ground_truth_path, wer_value in per_file_wers:
+        print(f"{hypothesis_path.name}, {wer_value:.4f}")
+
+    wer_values = [wer_value for _, _, wer_value in per_file_wers]
+    print(f"Mean WER: {mean(wer_values):.4f}")
+    print(f"Median WER: {median(wer_values):.4f}")
+    print(f"Std WER: {stdev(wer_values):.4f}" if len(wer_values) > 1 else "Std WER: 0.0000")
 
 
 if __name__ == "__main__":

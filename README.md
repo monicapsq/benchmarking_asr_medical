@@ -16,7 +16,7 @@ Each subdirectory has its own `README.md` with instructions.
 
 Tested with Python 3.12.13
 
-Install required packages:
+Required packaged can be installed with:
 
 ```bash
 pip install requirements.txt
@@ -26,6 +26,6 @@ pip install requirements.txt
 
 - `figuring_out.ipynb` contains information about the models, requirements etc.
 
-- `results.csv` contains evaluation results on the SIMSAMU dataset for the models tested - ⚠️ Under construction ⚠️
+- `results.csv` contains evaluation results on the SIMSAMU dataset for the models tested.
 
-- `requirements.txt`
+- `requirements.txt` contains required packages and versions.

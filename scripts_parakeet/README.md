@@ -7,7 +7,7 @@
 ```bash
 pip install nemo_toolkit[asr]
 ```
-I have version 2.7.3 (should I specify that?)
+Tested on version 2.7.3
 
 Then, download the model with the following command:
 

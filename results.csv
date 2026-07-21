@@ -1,2 +1,2 @@
-Model, processing_time, WER
-NeMo Parakeet 6M, 97s, 24.67%
+Model, transcription processing time, mean WER
+NeMo Parakeet 6M, 97s, 24.39%

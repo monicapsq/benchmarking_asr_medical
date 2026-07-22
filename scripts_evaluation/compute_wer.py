@@ -31,8 +31,10 @@ def main():
 
         return None
 
-    def compute_wer() -> list[tuple[Path, Path, float]]:
-        per_file_wers: list[tuple[Path, Path, float]] = []
+    def compute_wer() -> list[tuple[Path, Path, float, int]]:
+        per_file_wers: list[tuple[Path, Path, float, int]] = []
+        all_hyp = []
+        all_gt = []
 
         for hypothesis_path in sorted(hypothesis.rglob("*.txt")):
             ground_truth_path = resolve_ground_truth_path(hypothesis_path)
@@ -46,26 +48,33 @@ def main():
             with ground_truth_path.open("r", encoding="utf-8") as gt_file:
                 ground_truth_text = gt_file.read().strip()
 
-            wer_value = jiwer.wer(ground_truth_text, hypothesis_text)
-            per_file_wers.append((hypothesis_path, ground_truth_path, wer_value))
+            wer_value = jiwer.wer(ground_truth_text, hypothesis_text) # Compute WER using jiwer
+            per_file_wers.append((hypothesis_path, ground_truth_path, wer_value, len(hypothesis_text)))
+
+            # Store texts for overall WER computation
+            all_hyp.append(hypothesis_text)
+            all_gt.append(ground_truth_text)
 
         if not per_file_wers:
             raise FileNotFoundError(f"No matching .txt files found in {hypothesis}")
 
-        return per_file_wers
+        return per_file_wers, all_hyp, all_gt
         
     
-    print(f"Computing WER for hypothesis: {hypothesis} and ground truth: {ground_truth}")
-    per_file_wers = compute_wer()
+    # print(f"Computing WER for hypothesis: {hypothesis} and ground truth: {ground_truth}")
+    per_file_wers, all_hyp, all_gt = compute_wer() # Compute WER for each file and collect all texts for overall WER
 
     print("Per-file WERs:")
-    for hypothesis_path, ground_truth_path, wer_value in per_file_wers:
-        print(f"{hypothesis_path.name}, {wer_value:.4f}")
+    for hypothesis_path, _, wer_value, hypothesis_length in per_file_wers:
+        print(f"{hypothesis_path.name}, {wer_value:.4f}, {hypothesis_length}")
 
-    wer_values = [wer_value for _, _, wer_value in per_file_wers]
+    dataset_wer = jiwer.wer(all_gt, all_hyp) # WER for the entire dataset
+    print(f"\nDataset WER: {dataset_wer:.4f}")
+
+    wer_values = [wer_value for _, _, wer_value, _ in per_file_wers] # Extract WER values for statistics
     print(f"Mean WER: {mean(wer_values):.4f}")
-    print(f"Median WER: {median(wer_values):.4f}")
-    print(f"Std WER: {stdev(wer_values):.4f}" if len(wer_values) > 1 else "Std WER: 0.0000")
+    # print(f"Median WER: {median(wer_values):.4f}")
+    # print(f"Std WER: {stdev(wer_values):.4f}" if len(wer_values) > 1 else "Std WER: 0.0000")
 
 
 if __name__ == "__main__":

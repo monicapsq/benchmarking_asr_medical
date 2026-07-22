@@ -1,2 +1,2 @@
-Model, transcription processing time, mean WER
-NeMo Parakeet 6M, 97s, 24.39%
+Model, transcription processing time, WER, wacc
+NeMo Parakeet 6M, 97s, 24.77%, 76.32%

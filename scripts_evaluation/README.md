@@ -21,7 +21,7 @@ python compute_wer.py -h path/to/dir/of/hypothesis/transcriptions -gt path/to/di
 
 ## Computing MC-WER ([Adedeji et. al, 2024](https://arxiv.org/abs/2402.07658)) ⚠️ Work in progress ⚠️
 
-Medical Concept Word Error Rate (MC-WER) is an evaluation metric that, when computing WER, gives more weight to Substitutions, Insertions or Deletions regarding medically relevant words. 
+Medical Concept Word Error Rate (MC-WER) is an evaluation metric that computes WER related to Substitutions, Insertions or Deletions of medically relevant words. 
 
 The script `annotate.py` is a helper for JSON-based transcriptions like those of the SIMSAMU dataset, to test MC-WER. To use it it is needed to insert the path to the `.json` file to edit.
 
